@@ -5,14 +5,13 @@
  *   npx tsx scripts/seed-kv.ts
  *
  * Requires wrangler to be configured with the correct KV namespace ID.
- * Uses `wrangler kv:key put` to upload each page.
+ * Uses `wrangler kv key put` to upload each page.
  */
 
 import { execSync } from "child_process";
-import { readFileSync, existsSync } from "fs";
-import { resolve } from "path";
+import { writeFileSync, unlinkSync } from "fs";
 
-const LLMS_TXT_PATH = resolve(__dirname, "../../../docs/llms.txt");
+const LLMS_TXT_URL = "https://plaid.com/docs/llms.txt";
 const KV_NAMESPACE_BINDING = "DOCS_KV";
 
 interface DocEntry {
@@ -38,14 +37,13 @@ function parseLlmsTxt(content: string): DocEntry[] {
 }
 
 async function main() {
-  if (!existsSync(LLMS_TXT_PATH)) {
-    console.error(
-      "llms.txt not found. Run: curl -o docs/llms.txt https://plaid.com/docs/llms.txt",
-    );
+  console.log(`Fetching ${LLMS_TXT_URL}...`);
+  const llmsResp = await fetch(LLMS_TXT_URL);
+  if (!llmsResp.ok) {
+    console.error(`Failed to fetch llms.txt (HTTP ${llmsResp.status})`);
     process.exit(1);
   }
-
-  const content = readFileSync(LLMS_TXT_PATH, "utf-8");
+  const content = await llmsResp.text();
   const entries = parseLlmsTxt(content);
 
   console.log(`Found ${entries.length} doc pages to seed.`);
@@ -53,7 +51,7 @@ async function main() {
   // Seed the index
   const indexJson = JSON.stringify(entries);
   execSync(
-    `wrangler kv:key put --binding=${KV_NAMESPACE_BINDING} "_index" '${indexJson.replace(/'/g, "'\\''")}'`,
+    `wrangler kv key put --remote --binding=${KV_NAMESPACE_BINDING} "_index" '${indexJson.replace(/'/g, "'\\''")}'`,
     { stdio: "inherit" },
   );
   console.log("Seeded _index key.");
@@ -76,14 +74,14 @@ async function main() {
 
       // Write to a temp file to avoid shell escaping issues
       const tmpFile = `/tmp/plaid-kv-seed-${Date.now()}.txt`;
-      require("fs").writeFileSync(tmpFile, text);
+      writeFileSync(tmpFile, text);
 
       execSync(
-        `wrangler kv:key put --binding=${KV_NAMESPACE_BINDING} "${kvKey}" --path="${tmpFile}"`,
+        `wrangler kv key put --remote --binding=${KV_NAMESPACE_BINDING} "${kvKey}" --path="${tmpFile}"`,
         { stdio: "inherit" },
       );
 
-      require("fs").unlinkSync(tmpFile);
+      unlinkSync(tmpFile);
       succeeded++;
       console.log(`  OK ${entry.path} (${succeeded}/${entries.length})`);
 

@@ -99,7 +99,6 @@ plaid-mcp/
   packages/shared/       # Shared types (PlaidEnv, DocEntry, etc.)
   workers/api-server/    # Plaid API MCP server
   workers/docs-server/   # Plaid docs MCP server
-  docs/                  # Plaid llms.txt files
 ```
 
 pnpm monorepo with Cloudflare Workers.

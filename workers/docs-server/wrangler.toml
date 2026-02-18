@@ -5,7 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [[kv_namespaces]]
 binding = "DOCS_KV"
-id = "PLACEHOLDER_CREATE_WITH_WRANGLER"
+id = "bfc62559ce5c452bb0e7a54c3220ae03"
 
 [durable_objects]
 bindings = [
