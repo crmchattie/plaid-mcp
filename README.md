@@ -34,13 +34,17 @@ https://plaid-api-mcp.myplaid.workers.dev/mcp
 
 ### docs-server
 
-MCP server for searching and reading Plaid documentation, backed by KV-stored `llms.txt` content.
+MCP server for searching and reading Plaid documentation, backed by KV-stored `llms.txt` content. No authentication required. Deployed at:
+
+```
+https://plaid-docs-mcp.myplaid.workers.dev/mcp
+```
 
 **Tools:** `search_docs`, `get_doc_page`, `list_sections`
 
-## Authentication
+## Authentication (api-server)
 
-Every request (except CORS preflight) requires an `Authorization: Basic <base64(client_id:secret)>` header. The server does not validate credentials itself — if they're wrong, Plaid API calls fail with Plaid's own error messages.
+Every request (except CORS preflight) requires an `Authorization: Basic <base64(client_id:secret)>` header. The server does not validate credentials itself — if they're wrong, Plaid API calls fail with Plaid's own error messages. The docs-server requires no authentication.
 
 Credentials are kept **in-memory only**. The framework's default prop persistence to Durable Object storage is overridden so that Plaid secrets are never written to disk. Fresh credentials arrive on every request via the Authorization header.
 
@@ -51,11 +55,14 @@ Credentials are kept **in-memory only**. The framework's default prop persistenc
 ```json
 {
   "mcpServers": {
-    "plaid": {
+    "plaid-api": {
       "url": "https://plaid-api-mcp.myplaid.workers.dev/mcp",
       "headers": {
         "Authorization": "Basic <base64(client_id:secret)>"
       }
+    },
+    "plaid-docs": {
+      "url": "https://plaid-docs-mcp.myplaid.workers.dev/mcp"
     }
   }
 }
@@ -67,7 +74,8 @@ Credentials are kept **in-memory only**. The framework's default prop persistenc
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
-const transport = new StreamableHTTPClientTransport(
+// API server (requires Plaid credentials)
+const apiTransport = new StreamableHTTPClientTransport(
   new URL("https://plaid-api-mcp.myplaid.workers.dev/mcp"),
   {
     requestInit: {
@@ -78,8 +86,16 @@ const transport = new StreamableHTTPClientTransport(
   },
 );
 
-const client = new Client({ name: "my-agent", version: "1.0" });
-await client.connect(transport);
+const apiClient = new Client({ name: "my-agent", version: "1.0" });
+await apiClient.connect(apiTransport);
+
+// Docs server (no auth required)
+const docsTransport = new StreamableHTTPClientTransport(
+  new URL("https://plaid-docs-mcp.myplaid.workers.dev/mcp"),
+);
+
+const docsClient = new Client({ name: "my-agent", version: "1.0" });
+await docsClient.connect(docsTransport);
 ```
 
 ## Session Isolation
