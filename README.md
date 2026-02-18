@@ -99,6 +99,31 @@ const docsClient = new Client({ name: "my-agent", version: "1.0" });
 await docsClient.connect(docsTransport);
 ```
 
+### MCP SDK (Python)
+
+```python
+from base64 import b64encode
+from mcp.client.streamable_http import streamablehttp_client
+from mcp import ClientSession
+
+credentials = b64encode(f"{client_id}:{secret}".encode()).decode()
+
+# API server (requires Plaid credentials)
+async with streamablehttp_client(
+    "https://plaid-api-mcp.myplaid.workers.dev/mcp",
+    headers={"Authorization": f"Basic {credentials}"},
+) as (read, write, _):
+    async with ClientSession(read, write) as session:
+        await session.initialize()
+
+# Docs server (no auth required)
+async with streamablehttp_client(
+    "https://plaid-docs-mcp.myplaid.workers.dev/mcp",
+) as (read, write, _):
+    async with ClientSession(read, write) as session:
+        await session.initialize()
+```
+
 ## Session Isolation
 
 Each MCP session gets its own Durable Object instance (keyed by session ID):
