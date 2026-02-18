@@ -1,0 +1,17 @@
+name = "plaid-docs-mcp"
+main = "src/index.ts"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "DOCS_KV"
+id = "PLACEHOLDER_CREATE_WITH_WRANGLER"
+
+[durable_objects]
+bindings = [
+  { name = "MCP_AGENT", class_name = "PlaidDocsMcp" }
+]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["PlaidDocsMcp"]

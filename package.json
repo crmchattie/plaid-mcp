@@ -1,0 +1,12 @@
+{
+  "name": "plaid-mcp-servers",
+  "private": true,
+  "scripts": {
+    "dev:docs": "pnpm --filter docs-server dev",
+    "dev:api": "pnpm --filter api-server dev",
+    "deploy:docs": "pnpm --filter docs-server deploy",
+    "deploy:api": "pnpm --filter api-server deploy",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck"
+  }
+}

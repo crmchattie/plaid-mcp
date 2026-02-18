@@ -1,0 +1,16 @@
+name = "plaid-api-mcp"
+main = "src/index.ts"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+PLAID_ENV = "sandbox"
+
+[durable_objects]
+bindings = [
+  { name = "MCP_AGENT", class_name = "PlaidApiMcp" }
+]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["PlaidApiMcp"]
