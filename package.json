@@ -6,6 +6,7 @@
     "dev:api": "pnpm --filter api-server dev",
     "deploy:docs": "pnpm --filter docs-server deploy",
     "deploy:api": "pnpm --filter api-server deploy",
+    "dev:playground": "pnpm --filter playground dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck"
   }

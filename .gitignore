@@ -3,4 +3,6 @@ dist/
 .wrangler/
 *.log
 .env
+.env.local
 .dev.vars
+.next/

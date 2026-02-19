@@ -134,16 +134,143 @@ Each MCP session gets its own Durable Object instance (keyed by session ID):
 
 No cross-tenant data leakage is possible — DO storage is per-instance.
 
+## Security Model
+
+The API server handles real financial credentials and data across multiple tenants. The security design follows defense-in-depth: multiple independent layers must all fail for sensitive data to leak.
+
+### 1. Session Isolation via Durable Objects
+
+Each MCP session maps to its own [Cloudflare Durable Object](https://developers.cloudflare.com/durable-objects/) instance, keyed by `mcp-session-id`. Every session gets:
+
+- Its own `PlaidClient` with that user's credentials
+- Its own `TokenVault` in isolated DO storage
+- Its own disclosure preferences
+
+There is no shared state between sessions. Durable Object storage is per-instance by design — one session cannot read another's vault or credentials.
+
+### 2. Credentials Never Written to Disk
+
+The MCP framework (`McpAgent`) normally persists `props` to `ctx.storage` so Durable Objects can recover from hibernation. The API server **overrides both `onStart()` and `updateProps()`** to keep credentials in memory only:
+
+```typescript
+// workers/api-server/src/index.ts
+async onStart(props: PlaidProps) {
+  if (props) this.props = props;   // in-memory only
+  // ... framework wiring without storage.put()
+}
+
+async updateProps(props: PlaidProps) {
+  this.props = props;              // in-memory only, no persistence
+}
+```
+
+If the DO hibernates, the next HTTP request carries fresh credentials in the `Authorization` header, so the session recovers without needing stored secrets.
+
+### 3. Token Vault — Opaque Aliases
+
+When a public token is exchanged for an access token, the raw token is stored in the vault under an opaque alias (e.g., `"item-a1b2c3d4"`). The LLM only ever sees and references these aliases.
+
+Key design decisions in `TokenVault`:
+
+- **`store(alias, entry)`** — saves the full `VaultEntry` (including `access_token`) to DO storage
+- **`resolve(alias)`** — returns only the `access_token` string, used server-side by tools to make Plaid API calls
+- **`list()`** — returns metadata **with `access_token` explicitly stripped**:
+
+```typescript
+// workers/api-server/src/lib/token-vault.ts
+async list(): Promise<Record<string, Omit<VaultEntry, "access_token">>> {
+  const entries = await this.storage.list<VaultEntry>({ prefix: KEY_PREFIX });
+  const result: Record<string, Omit<VaultEntry, "access_token">> = {};
+  for (const [key, entry] of entries) {
+    const alias = key.slice(KEY_PREFIX.length);
+    const { access_token: _, ...metadata } = entry;  // strip token
+    result[alias] = metadata;
+  }
+  return result;
+}
+```
+
+The LLM can ask "what items do I have?" and gets back aliases and metadata, but never a raw token.
+
+### 4. Dual-Audience Response Filtering
+
+Plaid API responses contain financial data that the LLM doesn't always need to see in full. The server uses [MCP annotations](https://modelcontextprotocol.io/specification/2025-06-18/server/utilities/annotations) to send different content to the LLM vs. the end user:
+
+```typescript
+// workers/api-server/src/lib/tool-helpers.ts
+return {
+  content: [
+    {
+      type: "text",
+      text: summarize(data, level),          // safe summary
+      annotations: { audience: ["assistant"] },
+    },
+    {
+      type: "text",
+      text: JSON.stringify(data, null, 2),   // full response
+      annotations: { audience: ["user"] },
+    },
+  ],
+};
+```
+
+- **`audience: ["assistant"]`** — the LLM sees a summarized version with masked account numbers, redacted PII, and aggregated counts
+- **`audience: ["user"]`** — the client UI receives the full JSON response for display
+
+This means the LLM can reason about the data ("you have 3 checking accounts") without processing raw account numbers, SSNs, or routing numbers.
+
+### 5. Per-Category Data Summarization
+
+Each data category has its own summary function that controls what the LLM sees:
+
+| Category | LLM Sees (Summary) | LLM Sees (Detailed) | Always Hidden from LLM |
+|---|---|---|---|
+| **Accounts** | Count, names, masked numbers (`****1234`) | Same | Full account numbers |
+| **Auth** | Account count, ACH count | Same | Routing numbers, account numbers |
+| **Balance** | Account names, current/available balances | Same | Full account numbers |
+| **Identity** | Owner count | First names only | Full names, SSNs, addresses, phones, emails |
+| **Transactions** | Counts (added/modified/removed) | Date, merchant, amount, category | Full descriptions (in summary mode) |
+| **Investments** | Holding/security counts | Ticker, quantity, value | Cost basis, security IDs |
+| **Liabilities** | Type counts (credit/student/mortgage) | Balances, APR, min payments | Creditor details, account numbers |
+
+### 6. User-Controlled Disclosure Levels
+
+Users can control how much detail the LLM sees per category via two tools:
+
+- **`get_disclosure_settings`** — shows current levels
+- **`set_disclosure_level`** — changes a category between `"summary"` and `"detailed"`
+
+Defaults to `"summary"` for all configurable categories (transactions, investments, liabilities, identity). Auth, accounts, and balance are not configurable — they always use their fixed summary format.
+
+This gives users explicit control: "I want the LLM to see my transaction details so it can help me budget" vs. "just tell me the count."
+
+### 7. Input Validation
+
+All tool parameters are validated with Zod schemas before execution. Enum types restrict values to valid options (e.g., transfer networks to `ach | same-day-ach | wire`). The MCP framework rejects malformed inputs before they reach tool handlers.
+
+### Summary
+
+| Layer | What It Protects | Mechanism |
+|---|---|---|
+| Durable Object isolation | Cross-tenant data access | Separate DO instance per session |
+| In-memory credentials | Plaid secrets at rest | Override persistence, re-auth on wake |
+| Token vault aliases | Access tokens from LLM | Opaque refs, `list()` strips tokens |
+| Dual-audience annotations | Full API responses from LLM | MCP `audience` annotations |
+| Category summarization | PII, account numbers, SSNs | Per-category `summarize()` functions |
+| Disclosure preferences | Granular data exposure | User-controlled summary vs. detailed |
+| Zod validation | Malformed/injected inputs | Schema validation on all parameters |
+
 ## Project Structure
 
 ```
 plaid-mcp/
   packages/shared/       # Shared types (PlaidEnv, DocEntry, etc.)
-  workers/api-server/    # Plaid API MCP server
-  workers/docs-server/   # Plaid docs MCP server
+  workers/api-server/    # Plaid API MCP server (Cloudflare Worker)
+  workers/docs-server/   # Plaid docs MCP server (Cloudflare Worker)
+  apps/playground/       # Web playground (Next.js) — chat UI with MCP tools
 ```
 
-pnpm monorepo with Cloudflare Workers.
+pnpm monorepo. Workers deploy to Cloudflare, playground deploys to Vercel.
 
 ## Development
 
