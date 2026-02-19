@@ -59,10 +59,15 @@ export function Chat({
   const [currentModelId, setCurrentModelId] = useState(initialChatModel);
   const currentModelIdRef = useRef(currentModelId);
   const { credentials } = usePlaidCredentials();
+  const credentialsRef = useRef(credentials);
 
   useEffect(() => {
     currentModelIdRef.current = currentModelId;
   }, [currentModelId]);
+
+  useEffect(() => {
+    credentialsRef.current = credentials;
+  }, [credentials]);
 
   const {
     messages,
@@ -113,8 +118,8 @@ export function Chat({
               : { message: lastMessage }),
             selectedChatModel: currentModelIdRef.current,
             selectedVisibilityType: visibilityType,
-            plaidCredentials: credentials
-              ? { clientId: credentials.clientId, secret: credentials.secret }
+            plaidCredentials: credentialsRef.current
+              ? { clientId: credentialsRef.current.clientId, secret: credentialsRef.current.secret }
               : null,
             ...request.body,
           },
