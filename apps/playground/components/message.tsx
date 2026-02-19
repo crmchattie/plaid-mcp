@@ -1,7 +1,13 @@
 "use client";
 import type { UseChatHelpers } from "@ai-sdk/react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import type { Vote } from "@/lib/db/schema";
+import {
+  extractToolName,
+  formatToolTitle,
+  parseToolOutput,
+} from "@/lib/plaid/tool-output";
+import { TOOL_RENDERERS } from "@/lib/plaid/tool-renderers";
 import type { ChatMessage } from "@/lib/types";
 import { cn, sanitizeText } from "@/lib/utils";
 import { MessageContent } from "./elements/message";
@@ -174,26 +180,66 @@ const PurePreviewMessage = ({
               };
               const { toolCallId, state } = toolPart;
 
+              const toolName = extractToolName(toolPart.type);
+              const CustomRenderer = TOOL_RENDERERS[toolName];
+              const parsed = toolPart.output
+                ? parseToolOutput(toolPart.output)
+                : null;
+              const hasCustomRender =
+                CustomRenderer &&
+                parsed &&
+                !parsed.isError &&
+                (parsed.userData != null || parsed.rawText != null);
+
               return (
                 <Tool defaultOpen={true} key={toolCallId}>
-                  <ToolHeader state={state} type={toolPart.type} />
+                  <ToolHeader
+                    state={state}
+                    type={toolPart.type}
+                    title={formatToolTitle(toolName)}
+                  />
                   <ToolContent>
                     {(state === "input-available" ||
                       state === "approval-requested" ||
                       state === "approval-responded") &&
                       toolPart.input && <ToolInput input={toolPart.input} />}
-                    {state === "output-available" && toolPart.output && (
-                      <ToolOutput
-                        errorText={toolPart.errorText}
-                        output={
-                          <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words p-4 text-xs">
-                            {typeof toolPart.output === "string"
-                              ? toolPart.output
-                              : JSON.stringify(toolPart.output, null, 2)}
-                          </pre>
-                        }
-                      />
-                    )}
+                    {state === "output-available" &&
+                      toolPart.output &&
+                      (hasCustomRender ? (
+                        <ToolOutput
+                          errorText={toolPart.errorText}
+                          output={
+                            <Suspense
+                              fallback={
+                                <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words p-4 text-xs">
+                                  Loading...
+                                </pre>
+                              }
+                            >
+                              <div className="p-4">
+                                <CustomRenderer
+                                  data={
+                                    parsed.userData ?? parsed.rawText
+                                  }
+                                  input={toolPart.input}
+                                  toolName={toolName}
+                                />
+                              </div>
+                            </Suspense>
+                          }
+                        />
+                      ) : (
+                        <ToolOutput
+                          errorText={toolPart.errorText}
+                          output={
+                            <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words p-4 text-xs">
+                              {typeof toolPart.output === "string"
+                                ? toolPart.output
+                                : JSON.stringify(toolPart.output, null, 2)}
+                            </pre>
+                          }
+                        />
+                      ))}
                     {state === "approval-requested" &&
                       toolPart.approval?.id && (
                         <div className="flex items-center justify-end gap-2 border-t px-4 py-3">

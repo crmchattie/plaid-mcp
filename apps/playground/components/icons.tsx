@@ -1211,3 +1211,36 @@ export const WarningIcon = ({ size = 16 }: { size?: number }) => {
     </svg>
   );
 };
+
+export const PlaidIcon = ({ size = 24 }: { size?: number }) => (
+  <svg
+    height={size}
+    viewBox="0 0 24 24"
+    width={size}
+    fill="none"
+  >
+    <rect width="7" height="7" x="1" y="1" rx="1" fill="currentColor" />
+    <rect width="7" height="7" x="9" y="1" rx="1" fill="currentColor" opacity="0.7" />
+    <rect width="7" height="7" x="1" y="9" rx="1" fill="currentColor" opacity="0.7" />
+    <rect width="7" height="7" x="9" y="9" rx="1" fill="currentColor" opacity="0.4" />
+    <rect width="7" height="7" x="17" y="9" rx="1" fill="currentColor" opacity="0.7" />
+    <rect width="7" height="7" x="9" y="17" rx="1" fill="currentColor" opacity="0.7" />
+  </svg>
+);
+
+export const KeyIcon = ({ size = 16 }: { size?: number }) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor" }}
+    viewBox="0 0 16 16"
+    width={size}
+  >
+    <path
+      d="M10.5 1C8.01472 1 6 3.01472 6 5.5C6 5.95344 6.07033 6.39103 6.20105 6.80197L1 12V15H4V13H6V11H8L9.19803 9.79895C9.60897 9.92967 10.0466 10 10.5 10C12.9853 10 15 7.98528 15 5.5C15 3.01472 12.9853 1 10.5 1ZM11.5 5.5C12.0523 5.5 12.5 5.05228 12.5 4.5C12.5 3.94772 12.0523 3.5 11.5 3.5C10.9477 3.5 10.5 3.94772 10.5 4.5C10.5 5.05228 10.9477 5.5 11.5 5.5Z"
+      fill="currentColor"
+      fillRule="evenodd"
+      clipRule="evenodd"
+    />
+  </svg>
+);

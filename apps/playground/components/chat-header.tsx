@@ -7,7 +7,7 @@ import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Button } from "@/components/ui/button";
 import { usePlaidCredentials } from "@/lib/plaid/credentials-context";
 import { PlaidCredentialsDialog } from "./plaid-credentials-dialog";
-import { PlusIcon } from "./icons";
+import { KeyIcon, PlusIcon } from "./icons";
 import { useSidebar } from "./ui/sidebar";
 import { VisibilitySelector, type VisibilityType } from "./visibility-selector";
 
@@ -53,11 +53,14 @@ function PureChatHeader({
       )}
 
       <Button
-        className="order-3 hidden px-2 md:ml-auto md:flex md:h-fit"
+        className="order-3 ml-auto flex h-8 px-2 md:h-fit"
         variant={isConfigured ? "outline" : "default"}
         onClick={() => setShowCredentials(true)}
       >
-        {isConfigured ? "Plaid Credentials Set" : "Set Plaid Credentials"}
+        <KeyIcon size={16} />
+        <span className="hidden md:inline">
+          {isConfigured ? "Plaid Credentials Set" : "Set Plaid Credentials"}
+        </span>
       </Button>
 
       <PlaidCredentialsDialog
