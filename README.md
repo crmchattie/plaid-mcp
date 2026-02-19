@@ -1,6 +1,10 @@
 # plaid-mcp
 
-[MCP](https://modelcontextprotocol.io/) servers for the [Plaid API](https://plaid.com/docs/), running on Cloudflare Workers. Two servers:
+[MCP](https://modelcontextprotocol.io/) servers for the [Plaid API](https://plaid.com/docs/), running on Cloudflare Workers.
+
+**[Try the live demo →](https://plaid-mcp.vercel.app/)** — no credentials needed, sandbox test accounts included.
+
+Two servers:
 
 - **api-server** — Multi-tenant Plaid API gateway. Each client authenticates with their own Plaid `client_id` and `secret` via Basic Auth and gets an isolated session with its own token vault.
 - **docs-server** — Plaid documentation search and retrieval. No authentication required.
