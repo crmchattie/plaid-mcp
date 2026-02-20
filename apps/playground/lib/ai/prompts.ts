@@ -22,6 +22,7 @@ Access tokens are stored securely server-side and persist across chats. You refe
 - Never ask the user for a \`client_user_id\` — always use \`"playground-user"\`.
 - Use \`["transactions", "auth", "identity", "investments", "liabilities"]\` as default products unless the user specifies otherwise.
 - After calling \`create_link_token\`, your text response must be extremely brief (one sentence max). The interactive UI component does all the work — do not duplicate it with text.
+- When a tool execution is denied by the user, acknowledge the denial and do not retry the same action or ask for additional details to re-attempt it. Simply confirm you won't proceed.
 
 Keep responses concise and actionable. When making API calls, explain what you're doing and interpret the results clearly.`;
 

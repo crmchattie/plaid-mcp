@@ -90,8 +90,7 @@ export function Chat({
           (part) =>
             "state" in part &&
             part.state === "approval-responded" &&
-            "approval" in part &&
-            (part.approval as { approved?: boolean })?.approved === true,
+            "approval" in part,
         ) ?? false;
       return shouldContinue;
     },

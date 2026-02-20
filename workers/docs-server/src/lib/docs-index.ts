@@ -68,7 +68,7 @@ export function searchEntries(
   return entries
     .map((entry) => {
       const haystack =
-        `${entry.title} ${entry.section} ${entry.path}`.toLowerCase();
+        `${entry.title} ${entry.section ?? ""} ${entry.path}`.toLowerCase();
       const matchCount = terms.filter((t) => haystack.includes(t)).length;
       return { entry, score: matchCount / terms.length };
     })
@@ -87,19 +87,21 @@ export function buildSectionTree(
   const sectionMap = new Map<string, DocEntry[]>();
 
   for (const entry of entries) {
-    if (filterSection && entry.section.toLowerCase() !== filterSection.toLowerCase()) {
+    const entrySection = entry.section ?? "";
+    if (filterSection && entrySection.toLowerCase() !== filterSection.toLowerCase()) {
       continue;
     }
-    const existing = sectionMap.get(entry.section) ?? [];
+    const existing = sectionMap.get(entrySection) ?? [];
     existing.push(entry);
-    sectionMap.set(entry.section, existing);
+    sectionMap.set(entrySection, existing);
   }
 
   const nodes: SectionNode[] = [];
   for (const [section, sectionEntries] of sectionMap) {
+    const sectionName = section || "Uncategorized";
     nodes.push({
-      title: section,
-      path: section.toLowerCase().replace(/\s+/g, "-"),
+      title: sectionName,
+      path: sectionName.toLowerCase().replace(/\s+/g, "-"),
       children: sectionEntries.map((e) => ({
         title: e.title,
         path: e.path,
