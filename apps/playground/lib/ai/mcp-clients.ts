@@ -16,6 +16,7 @@ export type MCPClients = {
 
 export async function createPlaidMCPClients(
   credentials: PlaidCredentials | null,
+  sessionHint?: string,
 ): Promise<MCPClients> {
   const docsClientPromise = createMCPClient({
     transport: new StreamableHTTPClientTransport(new URL(DOCS_SERVER_URL)),
@@ -27,13 +28,16 @@ export async function createPlaidMCPClients(
       `${credentials.clientId}:${credentials.secret}`,
     ).toString("base64");
 
+    const headers: Record<string, string> = {
+      Authorization: `Basic ${basicAuth}`,
+    };
+    if (sessionHint) {
+      headers["X-Session-Hint"] = sessionHint;
+    }
+
     apiClientPromise = createMCPClient({
       transport: new StreamableHTTPClientTransport(new URL(API_SERVER_URL), {
-        requestInit: {
-          headers: {
-            Authorization: `Basic ${basicAuth}`,
-          },
-        },
+        requestInit: { headers },
       }),
     });
   }

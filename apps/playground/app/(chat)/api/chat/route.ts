@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { geolocation } from "@vercel/functions";
 import {
   convertToModelMessages,
@@ -147,8 +148,17 @@ export async function POST(request: Request) {
         : null
     );
 
+    // Compute a stable session hint so the same user always reaches the same
+    // Durable Object (and therefore the same TokenVault) across requests.
+    let sessionHint: string | undefined;
+    if (effectiveCredentials) {
+      sessionHint = createHash("sha256")
+        .update(`${effectiveCredentials.clientId}:${effectiveCredentials.secret}:${session.user.id}`)
+        .digest("hex");
+    }
+
     // Create MCP clients and fetch tools
-    mcpClients = await createPlaidMCPClients(effectiveCredentials);
+    mcpClients = await createPlaidMCPClients(effectiveCredentials, sessionHint);
     const tools = await getPlaidTools(mcpClients);
 
     const hasCredentials = Boolean(effectiveCredentials);

@@ -111,7 +111,7 @@ function parseBasicAuth(request: Request): PlaidProps | null {
 const mcpHandler = PlaidApiMcp.serve("/mcp", {
   binding: "MCP_AGENT",
   corsOptions: {
-    headers: "Content-Type, Accept, Authorization, mcp-session-id, mcp-protocol-version",
+    headers: "Content-Type, Accept, Authorization, X-Session-Hint, mcp-session-id, mcp-protocol-version",
   },
 });
 
@@ -125,6 +125,26 @@ export default {
     if (!creds) return unauthorized();
 
     Object.assign(ctx, { props: creds });
+
+    // Route to a deterministic Durable Object when the client provides a
+    // session hint.  This ensures the same user always reaches the same DO
+    // (and therefore the same TokenVault) across requests and chats.
+    const sessionHint = request.headers.get("X-Session-Hint");
+    if (sessionHint) {
+      const patchedEnv = {
+        ...env,
+        MCP_AGENT: new Proxy(env.MCP_AGENT, {
+          get(target, prop, receiver) {
+            if (prop === "newUniqueId") {
+              return () => target.idFromName(`hint:${sessionHint}`);
+            }
+            return Reflect.get(target, prop, receiver);
+          },
+        }),
+      } as Env;
+      return mcpHandler.fetch(request, patchedEnv, ctx);
+    }
+
     return mcpHandler.fetch(request, env, ctx);
   },
 } satisfies ExportedHandler<Env>;
