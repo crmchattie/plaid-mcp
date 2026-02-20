@@ -134,11 +134,12 @@ export default {
       const patchedEnv = {
         ...env,
         MCP_AGENT: new Proxy(env.MCP_AGENT, {
-          get(target, prop, receiver) {
+          get(target, prop, _receiver) {
             if (prop === "newUniqueId") {
               return () => target.idFromName(`hint:${sessionHint}`);
             }
-            return Reflect.get(target, prop, receiver);
+            const value = Reflect.get(target, prop);
+            return typeof value === "function" ? value.bind(target) : value;
           },
         }),
       } as Env;
