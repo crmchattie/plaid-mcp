@@ -84,7 +84,9 @@ export function CreateLinkTokenRenderer({ data, input }: ToolRendererProps) {
   const originalProducts = toolInput?.products ?? [];
 
   const [selectedProducts, setSelectedProducts] = useState<string[]>(
-    originalProducts.length > 0 ? [...originalProducts] : ["transactions"],
+    originalProducts.length > 0
+      ? [...originalProducts]
+      : PLAID_PRODUCTS.map((p) => p.id),
   );
   const [linkState, setLinkState] = useState<LinkState>("idle");
   const [connectedInstitution, setConnectedInstitution] = useState<

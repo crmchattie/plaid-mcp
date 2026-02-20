@@ -21,7 +21,7 @@ export const chatModels: ChatModel[] = [
     description: "Best balance of speed, intelligence, and cost",
   },
   {
-    id: "claude-opus-4-5-20250414",
+    id: "claude-opus-4-5-20251101",
     name: "Claude Opus 4.5",
     provider: "anthropic",
     description: "Most capable model for complex tasks",

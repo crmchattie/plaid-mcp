@@ -168,9 +168,12 @@ const PurePreviewMessage = ({
             }
 
             // Generic tool invocation rendering (MCP tools)
-            if (type.startsWith("tool-")) {
+            // Handles both static tools (type: "tool-<name>") and
+            // dynamic MCP tools (type: "dynamic-tool" with toolName property)
+            if (type.startsWith("tool-") || type === "dynamic-tool") {
               const toolPart = part as unknown as {
-                type: `tool-${string}`;
+                type: `tool-${string}` | "dynamic-tool";
+                toolName?: string;
                 toolCallId: string;
                 state: "input-streaming" | "input-available" | "approval-requested" | "approval-responded" | "output-available" | "output-error" | "output-denied";
                 input?: Record<string, unknown>;
@@ -180,7 +183,9 @@ const PurePreviewMessage = ({
               };
               const { toolCallId, state } = toolPart;
 
-              const toolName = extractToolName(toolPart.type);
+              const toolName = toolPart.type === "dynamic-tool"
+                ? (toolPart.toolName ?? "unknown")
+                : extractToolName(toolPart.type);
               const CustomRenderer = TOOL_RENDERERS[toolName];
               const parsed = toolPart.output
                 ? parseToolOutput(toolPart.output)

@@ -28,7 +28,7 @@ export const Tool = ({ className, ...props }: ToolProps) => (
 );
 
 export type ToolHeaderProps = {
-  type: ToolUIPart["type"];
+  type: ToolUIPart["type"] | "dynamic-tool";
   state: ToolUIPart["state"];
   /** Formatted display title. Falls back to `type` if not provided. */
   title?: string;
