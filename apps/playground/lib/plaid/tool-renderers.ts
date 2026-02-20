@@ -6,6 +6,7 @@ import { GetBalanceRenderer } from "@/components/plaid/get-balance";
 import { GetTransactionsSyncRenderer } from "@/components/plaid/get-transactions-sync";
 import { GetAuthRenderer } from "@/components/plaid/get-auth";
 import { CreateLinkTokenRenderer } from "@/components/plaid/create-link-token";
+import { GetLinkSessionRenderer } from "@/components/plaid/get-link-session";
 import { GetLiabilitiesRenderer } from "@/components/plaid/get-liabilities";
 import { GetInvestmentsHoldingsRenderer } from "@/components/plaid/get-investments-holdings";
 
@@ -56,6 +57,7 @@ export const TOOL_RENDERERS: Record<
   get_transactions_sync: GetTransactionsSyncRenderer,
   get_auth: GetAuthRenderer,
   create_link_token: CreateLinkTokenRenderer,
+  get_link_session: GetLinkSessionRenderer,
   get_liabilities: GetLiabilitiesRenderer,
   get_investments_holdings: GetInvestmentsHoldingsRenderer,
 

@@ -10,6 +10,7 @@ import { ChatHeader } from "@/components/chat-header";
 import { useAutoResume } from "@/hooks/use-auto-resume";
 import { useChatVisibility } from "@/hooks/use-chat-visibility";
 import { usePlaidCredentials } from "@/lib/plaid/credentials-context";
+import { PlaidLinkProvider } from "@/lib/plaid/link-context";
 import type { Vote } from "@/lib/db/schema";
 import { ChatSDKError } from "@/lib/errors";
 import type { Attachment, ChatMessage } from "@/lib/types";
@@ -174,45 +175,47 @@ export function Chat({
   });
 
   return (
-    <div className="overscroll-behavior-contain flex h-dvh min-w-0 touch-pan-y flex-col bg-background">
-      <ChatHeader
-        chatId={id}
-        isReadonly={isReadonly}
-        selectedVisibilityType={initialVisibilityType}
-      />
+    <PlaidLinkProvider sendMessage={sendMessage}>
+      <div className="overscroll-behavior-contain flex h-dvh min-w-0 touch-pan-y flex-col bg-background">
+        <ChatHeader
+          chatId={id}
+          isReadonly={isReadonly}
+          selectedVisibilityType={initialVisibilityType}
+        />
 
-      <Messages
-        addToolApprovalResponse={addToolApprovalResponse}
-        chatId={id}
-        isArtifactVisible={false}
-        isReadonly={isReadonly}
-        messages={messages}
-        regenerate={regenerate}
-        selectedModelId={initialChatModel}
-        setMessages={setMessages}
-        status={status}
-        votes={votes}
-      />
+        <Messages
+          addToolApprovalResponse={addToolApprovalResponse}
+          chatId={id}
+          isArtifactVisible={false}
+          isReadonly={isReadonly}
+          messages={messages}
+          regenerate={regenerate}
+          selectedModelId={initialChatModel}
+          setMessages={setMessages}
+          status={status}
+          votes={votes}
+        />
 
-      <div className="sticky bottom-0 z-1 mx-auto flex w-full max-w-4xl gap-2 border-t-0 bg-background px-2 pb-3 md:px-4 md:pb-4">
-        {!isReadonly && (
-          <MultimodalInput
-            attachments={attachments}
-            chatId={id}
-            input={input}
-            messages={messages}
-            onModelChange={setCurrentModelId}
-            selectedModelId={currentModelId}
-            selectedVisibilityType={visibilityType}
-            sendMessage={sendMessage}
-            setAttachments={setAttachments}
-            setInput={setInput}
-            setMessages={setMessages}
-            status={status}
-            stop={stop}
-          />
-        )}
+        <div className="sticky bottom-0 z-1 mx-auto flex w-full max-w-4xl gap-2 border-t-0 bg-background px-2 pb-3 md:px-4 md:pb-4">
+          {!isReadonly && (
+            <MultimodalInput
+              attachments={attachments}
+              chatId={id}
+              input={input}
+              messages={messages}
+              onModelChange={setCurrentModelId}
+              selectedModelId={currentModelId}
+              selectedVisibilityType={visibilityType}
+              sendMessage={sendMessage}
+              setAttachments={setAttachments}
+              setInput={setInput}
+              setMessages={setMessages}
+              status={status}
+              stop={stop}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </PlaidLinkProvider>
   );
 }

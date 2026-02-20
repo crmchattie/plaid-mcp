@@ -19,8 +19,8 @@ const docsSuggestions = [
 ];
 
 const apiSuggestions = [
+  "Connect a financial account",
   "Create a sandbox item and get the accounts",
-  "Get account balances for my linked item",
 ];
 
 function PureSuggestedActions({ chatId, sendMessage }: SuggestedActionsProps) {
