@@ -19,7 +19,7 @@ Access tokens are stored securely server-side. You reference them by alias (e.g.
 Keep responses concise and actionable. When making API calls, explain what you're doing and interpret the results clearly.`;
 
 const noCredentialsNote = `
-**Note:** No Plaid API credentials are configured. You can only use documentation search tools right now. To use API tools (create items, fetch accounts, etc.), the user needs to set their Plaid sandbox credentials using the credentials button in the header.`;
+**Note:** No Plaid API credentials are available for this session. Only documentation search tools are accessible right now.`;
 
 export type RequestHints = {
   latitude: Geo["latitude"];

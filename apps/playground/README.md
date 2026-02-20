@@ -1,71 +1,57 @@
-<a href="https://chat.vercel.ai/">
-  <img alt="Next.js 14 and App Router-ready AI chatbot." src="app/(chat)/opengraph-image.png">
-  <h1 align="center">Chat SDK</h1>
-</a>
+# Plaid MCP Playground
 
-<p align="center">
-    Chat SDK is a free, open-source template built with Next.js and the AI SDK that helps you quickly build powerful chatbot applications.
-</p>
+Web-based chat interface for exploring the Plaid API through conversation, powered by [MCP](https://modelcontextprotocol.io/) and Claude.
 
-<p align="center">
-  <a href="https://chat-sdk.dev"><strong>Read Docs</strong></a> ·
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#model-providers"><strong>Model Providers</strong></a> ·
-  <a href="#deploy-your-own"><strong>Deploy Your Own</strong></a> ·
-  <a href="#running-locally"><strong>Running locally</strong></a>
-</p>
-<br/>
+**[Live Demo →](https://plaid-mcp.vercel.app/)**
 
-## Features
+## What It Does
 
-- [Next.js](https://nextjs.org) App Router
-  - Advanced routing for seamless navigation and performance
-  - React Server Components (RSCs) and Server Actions for server-side rendering and increased performance
-- [AI SDK](https://ai-sdk.dev/docs/introduction)
-  - Unified API for generating text, structured objects, and tool calls with LLMs
-  - Hooks for building dynamic chat and generative user interfaces
-  - Supports xAI (default), OpenAI, Fireworks, and other model providers
-- [shadcn/ui](https://ui.shadcn.com)
-  - Styling with [Tailwind CSS](https://tailwindcss.com)
-  - Component primitives from [Radix UI](https://radix-ui.com) for accessibility and flexibility
-- Data Persistence
-  - [Neon Serverless Postgres](https://vercel.com/marketplace/neon) for saving chat history and user data
-  - [Vercel Blob](https://vercel.com/storage/blob) for efficient file storage
-- [Auth.js](https://authjs.dev)
-  - Simple and secure authentication
+This is an interactive playground that connects two MCP servers — one for the Plaid API (25 tools) and one for Plaid documentation search — to a Claude-powered chat interface. Users can:
 
-## Model Providers
+- Search Plaid docs, API references, and integration guides
+- Create sandbox items and test all Plaid API endpoints through conversation
+- View rich, structured results (account cards, transaction feeds, masked auth numbers, etc.) instead of raw JSON
 
-This template uses the [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) to access multiple AI models through a unified interface. The default configuration includes [xAI](https://x.ai) models (`grok-2-vision-1212`, `grok-3-mini`) routed through the gateway.
+Sandbox test credentials are built in — no Plaid account needed to try it.
 
-### AI Gateway Authentication
+## Architecture
 
-**For Vercel deployments**: Authentication is handled automatically via OIDC tokens.
+```
+Browser (Next.js)
+    ↓ chat messages + optional credentials
+  /api/chat (route.ts)
+    ↓ creates MCP clients per request
+  ┌─────────────────────────────┐
+  │  plaid-api-mcp (CF Worker)  │ ← 25 Plaid API tools
+  │  plaid-docs-mcp (CF Worker) │ ← 3 docs search tools
+  └─────────────────────────────┘
+    ↓ tool results with dual-audience annotations
+  Claude (Anthropic API)
+    ↓ streamed response
+  Browser → custom tool renderers
+```
 
-**For non-Vercel deployments**: You need to provide an AI Gateway API key by setting the `AI_GATEWAY_API_KEY` environment variable in your `.env.local` file.
+Key design decisions:
 
-With the [AI SDK](https://ai-sdk.dev/docs/introduction), you can also switch to direct LLM providers like [OpenAI](https://openai.com), [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), and [many more](https://ai-sdk.dev/providers/ai-sdk-providers) with just a few lines of code.
+- **Dual-audience annotations**: The API server sends separate content for the LLM (summarized, masked) and the user (full JSON). The client parses these and routes user-audience data to custom renderers.
+- **Token vault**: Access tokens are stored server-side under opaque aliases. The LLM never sees raw tokens.
+- **Per-request MCP clients**: Each chat request creates fresh MCP connections, so sessions are fully isolated.
 
-## Deploy Your Own
+## Stack
 
-You can deploy your own version of the Next.js AI Chatbot to Vercel with one click:
+- [Next.js 16](https://nextjs.org) with App Router
+- [AI SDK](https://ai-sdk.dev) for streaming chat with MCP tool support
+- [Anthropic Claude](https://anthropic.com) (Haiku 4.5 default, Sonnet/Opus available)
+- [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS
+- PostgreSQL (Drizzle ORM) for chat persistence
+- NextAuth for authentication (guest access supported)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/templates/next.js/nextjs-ai-chatbot)
-
-## Running locally
-
-You will need to use the environment variables [defined in `.env.example`](.env.example) to run Next.js AI Chatbot. It's recommended you use [Vercel Environment Variables](https://vercel.com/docs/projects/environment-variables) for this, but a `.env` file is all that is necessary.
-
-> Note: You should not commit your `.env` file or it will expose secrets that will allow others to control access to your various AI and authentication provider accounts.
-
-1. Install Vercel CLI: `npm i -g vercel`
-2. Link local instance with Vercel and GitHub accounts (creates `.vercel` directory): `vercel link`
-3. Download your environment variables: `vercel env pull`
+## Development
 
 ```bash
 pnpm install
-pnpm db:migrate # Setup database or apply latest database changes
+pnpm db:migrate
 pnpm dev
 ```
 
-Your app template should now be running on [localhost:3000](http://localhost:3000).
+Requires `POSTGRES_URL`, `AUTH_SECRET`, and optionally `PLAID_CLIENT_ID` + `PLAID_SECRET` for built-in sandbox credentials.

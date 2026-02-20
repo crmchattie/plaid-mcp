@@ -231,7 +231,7 @@ export async function POST(request: Request) {
           closeClients(mcpClients);
           mcpClients = null;
         }
-        return "Oops, an error occurred!";
+        return "Something went wrong processing your request. Please try again.";
       },
     });
 
