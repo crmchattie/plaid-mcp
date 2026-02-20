@@ -104,10 +104,26 @@ function audienceFilteredModelOutput({ output }: { toolCallId: string; input: un
   }
 }
 
+async function toolsWithRetry(client: MCPClient, retries = 2): Promise<Record<string, any>> {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await client.tools();
+    } catch (e) {
+      if (i === retries) {
+        console.error("Failed to fetch MCP tools after retries:", e);
+        return {};
+      }
+      // Brief delay before retry — server DO may still be initializing
+      await new Promise((r) => setTimeout(r, 500));
+    }
+  }
+  return {};
+}
+
 export async function getPlaidTools(clients: MCPClients) {
   const toolSets = await Promise.all([
-    clients.docsClient.tools(),
-    clients.apiClient?.tools() ?? Promise.resolve({}),
+    toolsWithRetry(clients.docsClient),
+    clients.apiClient ? toolsWithRetry(clients.apiClient) : Promise.resolve({}),
   ]);
 
   const tools: Record<string, any> = { ...toolSets[0], ...toolSets[1] };
