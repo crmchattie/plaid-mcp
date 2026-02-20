@@ -60,15 +60,48 @@ export function registerTransferTools(
       const resolved = await resolveItemRef(vault, item_ref);
       if ("isError" in resolved) return resolved;
 
-      const result = await client.request("/transfer/create", {
+      // Step 1: Authorize the transfer
+      const authResult = await client.request("/transfer/authorization/create", {
         access_token: resolved.access_token,
         account_id,
         type,
         network,
         amount,
-        description,
         ach_class,
         user,
+      });
+
+      if (authResult.error) return formatResponse(authResult);
+
+      const authorization = (authResult.data as Record<string, any>)?.authorization;
+      const authorizationId = authorization?.id;
+      if (!authorizationId) {
+        return {
+          content: [{
+            type: "text" as const,
+            text: `Transfer authorization failed: no authorization_id returned.\n${JSON.stringify(authResult.data, null, 2)}`,
+          }],
+          isError: true,
+        };
+      }
+
+      if (authorization.decision !== "approved") {
+        const rationale = authorization.decision_rationale;
+        return {
+          content: [{
+            type: "text" as const,
+            text: `Transfer authorization ${authorization.decision}: ${rationale?.code ?? "unknown"} — ${rationale?.description ?? "no details"}`,
+          }],
+          isError: true,
+        };
+      }
+
+      // Step 2: Create the transfer using the authorization
+      const result = await client.request("/transfer/create", {
+        access_token: resolved.access_token,
+        account_id,
+        authorization_id: authorizationId,
+        description,
       });
       return formatResponse(result);
     },

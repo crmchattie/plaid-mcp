@@ -4,6 +4,7 @@ import type { ToolRendererProps } from "@/lib/plaid/tool-renderers";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { AccountTypeIcon } from "./shared/account-type-icon";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +52,8 @@ export function GetBalanceRenderer({ data }: ToolRendererProps) {
           Live balances
         </span>
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <ScrollArea className="max-h-[32rem] pr-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {accounts.map((acct) => {
           const hasLimit = acct.balances.limit != null && acct.balances.limit > 0;
           const usagePercent =
@@ -137,7 +139,8 @@ export function GetBalanceRenderer({ data }: ToolRendererProps) {
             </Card>
           );
         })}
-      </div>
+        </div>
+      </ScrollArea>
     </div>
   );
 }

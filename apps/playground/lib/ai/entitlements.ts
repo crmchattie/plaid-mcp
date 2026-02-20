@@ -9,13 +9,13 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
    * For users without an account (auto-created guest sessions)
    */
   guest: {
-    maxMessagesPerDay: 20,
+    maxMessagesPerDay: 100,
   },
 
   /*
    * For users with an account
    */
   regular: {
-    maxMessagesPerDay: 50,
+    maxMessagesPerDay: 200,
   },
 };

@@ -118,7 +118,7 @@ export function GetTransactionsSyncRenderer({ data }: ToolRendererProps) {
       </div>
 
       {added.length > 0 && (
-        <ScrollArea className="max-h-[32rem]">
+        <ScrollArea className="max-h-[32rem] pr-3">
           <div className="space-y-4">
             {groups.map(([date, txns]) => (
               <div key={date}>

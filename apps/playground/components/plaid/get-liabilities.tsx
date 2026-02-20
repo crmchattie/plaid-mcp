@@ -6,6 +6,7 @@ import type { ToolRendererProps } from "@/lib/plaid/tool-renderers";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 type CreditLiability = {
@@ -122,8 +123,9 @@ export function GetLiabilitiesRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <div className="space-y-2">
-      {credit.length > 0 && (
+    <ScrollArea className="max-h-[32rem] pr-3">
+      <div className="space-y-2">
+        {credit.length > 0 && (
         <Section count={credit.length} title="Credit Cards">
           {credit.map((c, i) => {
             const mainApr = c.aprs?.find(
@@ -253,7 +255,8 @@ export function GetLiabilitiesRenderer({ data }: ToolRendererProps) {
             </Card>
           ))}
         </Section>
-      )}
-    </div>
+        )}
+      </div>
+    </ScrollArea>
   );
 }

@@ -3,6 +3,7 @@
 import { ShieldIcon } from "lucide-react";
 import type { ToolRendererProps } from "@/lib/plaid/tool-renderers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { MaskedField } from "./shared/masked-field";
 
 type IdentityOwner = {
@@ -29,12 +30,13 @@ export function GetIdentityRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
-        <ShieldIcon className="size-4 shrink-0" />
-        <span>Personal information is masked by default for privacy</span>
-      </div>
-      {parsed.accounts.map((acct) =>
+    <ScrollArea className="max-h-[32rem] pr-3">
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
+          <ShieldIcon className="size-4 shrink-0" />
+          <span>Personal information is masked by default for privacy</span>
+        </div>
+        {parsed.accounts.map((acct) =>
         acct.owners?.map((owner, oi) => (
           <Card key={`${acct.account_id}-${oi}`}>
             <CardHeader className="pb-2">
@@ -78,7 +80,8 @@ export function GetIdentityRenderer({ data }: ToolRendererProps) {
             </CardContent>
           </Card>
         ))
-      )}
-    </div>
+        )}
+      </div>
+    </ScrollArea>
   );
 }

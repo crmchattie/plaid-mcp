@@ -4,6 +4,7 @@ import { ExternalLinkIcon, FileTextIcon } from "lucide-react";
 import type { ToolRendererProps } from "@/lib/plaid/tool-renderers";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type DocResult = {
   title: string;
@@ -63,8 +64,9 @@ export function SearchDocsRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <div className="space-y-2">
-      {results.map((result, i) => (
+    <ScrollArea className="max-h-[32rem] pr-3">
+      <div className="space-y-2">
+        {results.map((result, i) => (
         <Card key={i}>
           <CardContent className="flex items-start gap-3 p-3">
             <FileTextIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
@@ -97,7 +99,8 @@ export function SearchDocsRenderer({ data }: ToolRendererProps) {
             </div>
           </CardContent>
         </Card>
-      ))}
-    </div>
+        ))}
+      </div>
+    </ScrollArea>
   );
 }

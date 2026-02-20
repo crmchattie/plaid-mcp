@@ -45,7 +45,7 @@ export function ListTransfersRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <ScrollArea className="max-h-[32rem]">
+    <ScrollArea className="max-h-[32rem] pr-3">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b text-left text-xs text-muted-foreground">

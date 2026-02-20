@@ -70,7 +70,7 @@ export function GetInvestmentsHoldingsRenderer({ data }: ToolRendererProps) {
     ?.close_price_as_of;
 
   return (
-    <ScrollArea className="max-h-[32rem]">
+    <ScrollArea className="max-h-[32rem] pr-3">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b text-left text-xs text-muted-foreground">

@@ -4,6 +4,7 @@ import { ShieldAlertIcon } from "lucide-react";
 import type { ToolRendererProps } from "@/lib/plaid/tool-renderers";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { AccountTypeIcon } from "./shared/account-type-icon";
 import { MaskedField } from "./shared/masked-field";
 
@@ -59,8 +60,9 @@ export function GetAuthRenderer({ data }: ToolRendererProps) {
   const { accounts, numbers } = parsed;
 
   return (
-    <div className="space-y-3">
-      {accounts.map((acct) => {
+    <ScrollArea className="max-h-[32rem] pr-3">
+      <div className="space-y-3">
+        {accounts.map((acct) => {
         const ach = numbers?.ach?.find((n) => n.account_id === acct.account_id);
         const eft = numbers?.eft?.find((n) => n.account_id === acct.account_id);
         const intl = numbers?.international?.find(
@@ -121,11 +123,12 @@ export function GetAuthRenderer({ data }: ToolRendererProps) {
             </CardContent>
           </Card>
         );
-      })}
-      <div className="flex items-center gap-2 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
-        <ShieldAlertIcon className="size-4 shrink-0" />
-        <span>These numbers are not visible to the AI assistant</span>
+        })}
+        <div className="flex items-center gap-2 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
+          <ShieldAlertIcon className="size-4 shrink-0" />
+          <span>These numbers are not visible to the AI assistant</span>
+        </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 }

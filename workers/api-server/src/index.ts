@@ -40,9 +40,15 @@ export class PlaidApiMcp extends McpAgent<Env, unknown, PlaidProps> {
   // the Authorization header, so fresh credentials arrive on every request
   // (including hibernation wake).
 
+  private initialized = false;
+
   async onStart(props: PlaidProps) {
     if (props) this.props = props;
-    await this.init();
+    // If props are missing (hibernation wake with no persisted creds),
+    // skip init — updateProps will re-init when the next request arrives.
+    if (this.props?.clientId) {
+      await this.init();
+    }
     const server = await this.server;
     // Complete transport setup via framework internals (underscore-convention,
     // not #-private — accessible at runtime). If the framework renames these,
@@ -55,6 +61,10 @@ export class PlaidApiMcp extends McpAgent<Env, unknown, PlaidProps> {
 
   async updateProps(props: PlaidProps) {
     this.props = props;
+    // Re-initialize tools if we skipped init during hibernation wake.
+    if (!this.initialized && props?.clientId) {
+      await this.init();
+    }
   }
 
   async init() {
@@ -79,6 +89,7 @@ export class PlaidApiMcp extends McpAgent<Env, unknown, PlaidProps> {
     registerInvestmentTools(this.server, client, vault);
     registerLiabilityTools(this.server, client, vault);
     registerTransferTools(this.server, client, vault);
+    this.initialized = true;
   }
 }
 

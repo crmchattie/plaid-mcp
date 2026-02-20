@@ -60,7 +60,7 @@ function PureMessages({
                 status === "streaming" && messages.length - 1 === index
               }
               isReadonly={isReadonly}
-              key={message.id}
+              key={`${message.id}-${index}`}
               message={message}
               regenerate={regenerate}
               requiresScrollPadding={

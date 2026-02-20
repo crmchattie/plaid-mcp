@@ -72,10 +72,10 @@ export function GetItemRenderer({ data }: ToolRendererProps) {
     return <p className="text-sm text-muted-foreground">No item data.</p>;
   }
 
-  const products = [
+  const products = [...new Set([
     ...(item.billed_products ?? []),
     ...(item.products ?? []),
-  ];
+  ])];
 
   return (
     <Card>

@@ -4,6 +4,7 @@ import { LinkIcon } from "lucide-react";
 import type { ToolRendererProps } from "@/lib/plaid/tool-renderers";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type ParsedItem = {
   alias: string;
@@ -50,8 +51,9 @@ export function ListItemsRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {items.map((item) => (
+    <ScrollArea className="max-h-[32rem] pr-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {items.map((item) => (
         <Card key={item.alias}>
           <CardContent className="flex items-start gap-3 p-4">
             <LinkIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
@@ -73,7 +75,8 @@ export function ListItemsRenderer({ data }: ToolRendererProps) {
             </div>
           </CardContent>
         </Card>
-      ))}
-    </div>
+        ))}
+      </div>
+    </ScrollArea>
   );
 }

@@ -162,7 +162,31 @@ export async function POST(request: Request) {
     const tools = await getPlaidTools(mcpClients);
 
     const hasCredentials = Boolean(effectiveCredentials);
-    const modelMessages = await convertToModelMessages(uiMessages);
+
+    // Strip incomplete tool invocation parts (e.g. approval-requested that was
+    // never resolved) so they don't become orphaned tool_use blocks that the
+    // Anthropic API rejects.
+    const COMPLETE_TOOL_STATES = new Set([
+      "output-available",
+      "output-error",
+      "output-denied",
+      "approval-responded",
+    ]);
+    const sanitizedMessages = uiMessages.map((msg) => ({
+      ...msg,
+      parts: msg.parts.filter((part) => {
+        if (
+          (part.type.startsWith("tool-") || part.type === "dynamic-tool") &&
+          "state" in part &&
+          typeof part.state === "string" &&
+          !COMPLETE_TOOL_STATES.has(part.state)
+        ) {
+          return false;
+        }
+        return true;
+      }),
+    }));
+    const modelMessages = await convertToModelMessages(sanitizedMessages);
 
     const stream = createUIMessageStream({
       originalMessages: isToolApprovalFlow ? uiMessages : undefined,

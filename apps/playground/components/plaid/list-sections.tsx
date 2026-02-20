@@ -3,6 +3,7 @@
 import { ChevronDownIcon, FolderIcon, FileTextIcon } from "lucide-react";
 import { useState } from "react";
 import type { ToolRendererProps } from "@/lib/plaid/tool-renderers";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 type DocSection = {
@@ -85,10 +86,12 @@ export function ListSectionsRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <div className="space-y-2">
-      {sections.map((section, i) => (
-        <SectionAccordion key={i} section={section} />
-      ))}
-    </div>
+    <ScrollArea className="max-h-[32rem] pr-3">
+      <div className="space-y-2">
+        {sections.map((section, i) => (
+          <SectionAccordion key={i} section={section} />
+        ))}
+      </div>
+    </ScrollArea>
   );
 }

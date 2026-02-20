@@ -3,6 +3,7 @@
 import type { ToolRendererProps } from "@/lib/plaid/tool-renderers";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { AccountTypeIcon } from "./shared/account-type-icon";
 import { cn } from "@/lib/utils";
 
@@ -49,8 +50,9 @@ export function GetAccountsRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {accounts.map((acct) => (
+    <ScrollArea className="max-h-[32rem] pr-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {accounts.map((acct) => (
         <Card
           className={cn(
             "border-l-4",
@@ -111,7 +113,8 @@ export function GetAccountsRenderer({ data }: ToolRendererProps) {
             )}
           </CardContent>
         </Card>
-      ))}
-    </div>
+        ))}
+      </div>
+    </ScrollArea>
   );
 }

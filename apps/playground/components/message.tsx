@@ -202,11 +202,10 @@ const PurePreviewMessage = ({
                     state={state}
                     type={toolPart.type}
                     title={formatToolTitle(toolName)}
+                    approved={toolPart.approval?.approved}
                   />
                   <ToolContent>
-                    {(state === "input-available" ||
-                      state === "approval-requested" ||
-                      state === "approval-responded") &&
+                    {state === "input-available" &&
                       toolPart.input && <ToolInput input={toolPart.input} />}
                     {state === "output-available" &&
                       toolPart.output &&
