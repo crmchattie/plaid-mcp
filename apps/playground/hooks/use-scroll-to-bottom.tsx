@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export function useScrollToBottom() {
+export function useScrollToBottom({ autoScrollEnabled = true }: { autoScrollEnabled?: boolean } = {}) {
+  const autoScrollEnabledRef = useRef(autoScrollEnabled);
+
+  useEffect(() => {
+    autoScrollEnabledRef.current = autoScrollEnabled;
+  }, [autoScrollEnabled]);
   const containerRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
@@ -70,8 +75,8 @@ export function useScrollToBottom() {
     }
 
     const scrollIfNeeded = () => {
-      // Only auto-scroll if user was at bottom and isn't actively scrolling
-      if (isAtBottomRef.current && !isUserScrollingRef.current) {
+      // Only auto-scroll if enabled, user was at bottom, and isn't actively scrolling
+      if (autoScrollEnabledRef.current && isAtBottomRef.current && !isUserScrollingRef.current) {
         requestAnimationFrame(() => {
           container.scrollTo({
             top: container.scrollHeight,
