@@ -190,6 +190,8 @@ export function Chat({
           messages={messages}
           regenerate={regenerate}
           selectedModelId={initialChatModel}
+          selectedVisibilityType={visibilityType}
+          sendMessage={sendMessage}
           setMessages={setMessages}
           status={status}
           votes={votes}

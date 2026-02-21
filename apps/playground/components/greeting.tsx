@@ -1,15 +1,27 @@
 "use client";
 
+import type { UseChatHelpers } from "@ai-sdk/react";
 import { motion } from "framer-motion";
 import { BookOpenIcon, ServerIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { ChatMessage } from "@/lib/types";
 import { PlaidIcon } from "./icons";
+import { SuggestedActions } from "./suggested-actions";
+import type { VisibilityType } from "./visibility-selector";
 
-export const Greeting = () => {
+export const Greeting = ({
+  chatId,
+  sendMessage,
+  selectedVisibilityType,
+}: {
+  chatId: string;
+  sendMessage: UseChatHelpers<ChatMessage>["sendMessage"];
+  selectedVisibilityType: VisibilityType;
+}) => {
   return (
     <div
-      className="mx-auto mt-4 flex size-full max-w-3xl flex-col justify-center gap-6 px-4 md:mt-16 md:px-8"
+      className="mx-auto mt-4 flex w-full max-w-3xl flex-col gap-6 px-4 md:mt-16 md:px-8"
       key="overview"
     >
       <div className="flex flex-col gap-2">
@@ -82,6 +94,19 @@ export const Greeting = () => {
             </Badge>
           </CardContent>
         </Card>
+      </motion.div>
+
+      <motion.div
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 10 }}
+        transition={{ delay: 0.8 }}
+      >
+        <SuggestedActions
+          chatId={chatId}
+          selectedVisibilityType={selectedVisibilityType}
+          sendMessage={sendMessage}
+        />
       </motion.div>
     </div>
   );
