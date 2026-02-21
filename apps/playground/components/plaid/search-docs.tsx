@@ -64,7 +64,7 @@ export function SearchDocsRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <ScrollArea className="max-h-[32rem] pr-3">
+    <ScrollArea className="max-h-[32rem] pr-0 sm:pr-3">
       <div className="space-y-2">
         {results.map((result, i) => (
         <Card key={i}>

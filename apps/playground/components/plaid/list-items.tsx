@@ -51,7 +51,7 @@ export function ListItemsRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <ScrollArea className="max-h-[32rem] pr-3">
+    <ScrollArea className="max-h-[32rem] pr-0 sm:pr-3">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {items.map((item) => (
         <Card key={item.alias}>

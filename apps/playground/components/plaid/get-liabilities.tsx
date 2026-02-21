@@ -123,7 +123,7 @@ export function GetLiabilitiesRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <ScrollArea className="max-h-[32rem] pr-3">
+    <ScrollArea className="max-h-[32rem] pr-0 sm:pr-3">
       <div className="space-y-2">
         {credit.length > 0 && (
         <Section count={credit.length} title="Credit Cards">
@@ -152,7 +152,7 @@ export function GetLiabilitiesRenderer({ data }: ToolRendererProps) {
                       <Badge variant="destructive">Overdue</Badge>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                     <div>
                       <p className="text-xs text-muted-foreground">Min payment</p>
                       <p className="tabular-nums">{fmt(c.minimum_payment_amount)}</p>
@@ -189,7 +189,7 @@ export function GetLiabilitiesRenderer({ data }: ToolRendererProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 pb-4">
-                <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                   <div>
                     <p className="text-xs text-muted-foreground">Rate</p>
                     <p className="tabular-nums">
@@ -236,7 +236,7 @@ export function GetLiabilitiesRenderer({ data }: ToolRendererProps) {
                     <Badge variant="outline">PMI</Badge>
                   )}
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                   <div>
                     <p className="text-xs text-muted-foreground">Monthly payment</p>
                     <p className="tabular-nums">{fmt(m.next_monthly_payment)}</p>

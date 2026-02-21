@@ -52,7 +52,7 @@ export function GetBalanceRenderer({ data }: ToolRendererProps) {
           Live balances
         </span>
       </div>
-      <ScrollArea className="max-h-[32rem] pr-3">
+      <ScrollArea className="max-h-[32rem] pr-0 sm:pr-3">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {accounts.map((acct) => {
           const hasLimit = acct.balances.limit != null && acct.balances.limit > 0;
@@ -83,7 +83,7 @@ export function GetBalanceRenderer({ data }: ToolRendererProps) {
                     </Badge>
                   )}
                 </div>
-                <div className="flex items-baseline gap-4">
+                <div className="flex flex-wrap items-baseline gap-4">
                   <div>
                     <p className="text-xs text-muted-foreground">Current</p>
                     <p className="font-semibold text-xl tabular-nums">

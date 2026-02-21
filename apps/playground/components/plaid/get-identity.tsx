@@ -30,7 +30,7 @@ export function GetIdentityRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <ScrollArea className="max-h-[32rem] pr-3">
+    <ScrollArea className="max-h-[32rem] pr-0 sm:pr-3">
       <div className="space-y-3">
         <div className="flex items-center gap-2 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
           <ShieldIcon className="size-4 shrink-0" />

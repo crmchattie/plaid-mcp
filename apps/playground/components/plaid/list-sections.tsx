@@ -86,7 +86,7 @@ export function ListSectionsRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <ScrollArea className="max-h-[32rem] pr-3">
+    <ScrollArea className="max-h-[32rem] pr-0 sm:pr-3">
       <div className="space-y-2">
         {sections.map((section, i) => (
           <SectionAccordion key={i} section={section} />

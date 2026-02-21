@@ -50,7 +50,7 @@ export function GetAccountsRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <ScrollArea className="max-h-[32rem] pr-3">
+    <ScrollArea className="max-h-[32rem] pr-0 sm:pr-3">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {accounts.map((acct) => (
         <Card
@@ -80,7 +80,7 @@ export function GetAccountsRenderer({ data }: ToolRendererProps) {
                 ••••{acct.mask}
               </p>
             )}
-            <div className="flex items-baseline gap-3">
+            <div className="flex flex-wrap items-baseline gap-3">
               <div>
                 <p className="text-xs text-muted-foreground">Current</p>
                 <p className="font-semibold text-lg tabular-nums">

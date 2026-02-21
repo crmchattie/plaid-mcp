@@ -45,8 +45,9 @@ export function ListTransfersRenderer({ data }: ToolRendererProps) {
   }
 
   return (
-    <ScrollArea className="max-h-[32rem] pr-3">
-      <table className="w-full text-sm">
+    <ScrollArea className="max-h-[32rem] pr-0 sm:pr-3">
+      <div className="overflow-x-auto">
+      <table className="min-w-[32rem] w-full text-sm">
         <thead>
           <tr className="border-b text-left text-xs text-muted-foreground">
             <th className="pb-2 pr-3 font-medium">Date</th>
@@ -99,6 +100,7 @@ export function ListTransfersRenderer({ data }: ToolRendererProps) {
           ))}
         </tbody>
       </table>
+      </div>
     </ScrollArea>
   );
 }

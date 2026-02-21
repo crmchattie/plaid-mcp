@@ -220,7 +220,7 @@ const PurePreviewMessage = ({
                                 </pre>
                               }
                             >
-                              <div className="p-4">
+                              <div className="p-3 sm:p-4">
                                 <CustomRenderer
                                   data={
                                     parsed.userData ?? parsed.rawText
